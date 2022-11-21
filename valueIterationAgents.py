@@ -62,7 +62,20 @@ class ValueIterationAgent(ValueEstimationAgent):
     def runValueIteration(self):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-
+        # Bucle de valor de iteraciones
+        for i in range(self.iterations):
+          #Inicializamos contador para guardar un valor de iteración
+          iterVals = self.values.copy()
+          #Bucle por cada estado
+          for s in self.mdp.getStates():
+            #Si el estado es terminal asignamos 0
+            if self.mdp.isTerminal(s):
+              self.values[s] = 0
+            #Si el estado no es terminal asignamos el mayor valor de la suma de recompensas de diferentes acciones
+            else:
+              actions = self.mdp.getPossibleActions(s)
+              iterVals[s] = max([self.computeQValueFromValues(s, a) for a in actions])
+          self.values = iterVals
 
     def getValue(self, state):
         """
@@ -77,19 +90,34 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #Calculamos el valor Q para cada acción-estado
+        q = 0
+        transitionStatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
+       
+        for s in TransitionStatesAndProbs(state, action):
+          
+          q = q + s[1]*(self.mdp.getReward(state, action, s[0])+self.discount*self.values[s[0]])
+    
+
+        return q
 
     def computeActionFromValues(self, state):
         """
           The policy is the best action in the given state
           according to the values currently stored in self.values.
-
           You may break ties any way you see fit.  Note that if
           there are no legal actions, which is the case at the
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #Guardamos en sa el valor q para cada acción-estado
+        
+        sa = util.Counter()
+        
+        for a in self.mdp.getPossibleActions(state):
+                sa[a] = self.computeQValueFromValues(state,a)
+        #Devolvemos aquella acción-estado que maximiza la recompensa
+        return sa.argMax()
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
@@ -150,4 +178,3 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
-
