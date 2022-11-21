@@ -20,8 +20,9 @@
 # value iteration.
 
 def question2():
+    #Asignamos 0 al ruido de forma que el agente se dirija al estado deseado
     answerDiscount = 0.9
-    answerNoise = 0.01
+    answerNoise = 0
     return answerDiscount, answerNoise
 
 def question3a():
