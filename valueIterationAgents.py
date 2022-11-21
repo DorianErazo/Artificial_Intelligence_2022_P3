@@ -34,7 +34,6 @@ import collections
 class ValueIterationAgent(ValueEstimationAgent):
     """
         * Please read learningAgents.py before reading this.*
-
         A ValueIterationAgent takes a Markov decision process
         (see mdp.py) on initialization and runs value iteration
         for a given number of iterations using the supplied
@@ -45,7 +44,6 @@ class ValueIterationAgent(ValueEstimationAgent):
           Your value iteration agent should take an mdp on
           construction, run the indicated number of iterations
           and then act according to the resulting policy.
-
           Some useful mdp methods you will use:
               mdp.getStates()
               mdp.getPossibleActions(state)
@@ -132,7 +130,6 @@ class ValueIterationAgent(ValueEstimationAgent):
 class AsynchronousValueIterationAgent(ValueIterationAgent):
     """
         * Please read learningAgents.py before reading this.*
-
         An AsynchronousValueIterationAgent takes a Markov decision process
         (see mdp.py) on initialization and runs cyclic value iteration
         for a given number of iterations using the supplied
@@ -146,7 +143,6 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
           updates the value of only one state, which cycles through
           the states list. If the chosen state is terminal, nothing
           happens in that iteration.
-
           Some useful mdp methods you will use:
               mdp.getStates()
               mdp.getPossibleActions(state)
@@ -162,7 +158,6 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
         * Please read learningAgents.py before reading this.*
-
         A PrioritizedSweepingValueIterationAgent takes a Markov decision process
         (see mdp.py) on initialization and runs prioritized sweeping value iteration
         for a given number of iterations using the supplied parameters.
