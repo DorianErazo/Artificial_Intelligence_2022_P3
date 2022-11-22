@@ -92,7 +92,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         q = 0
         transitionStatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
         #Calculamos el valor Q para cada acción-estado
-        for s in TransitionStatesAndProbs(state, action):
+        for s in transitionStatesAndProbs:
           
           q = q + s[1]*(self.mdp.getReward(state, action, s[0])+self.discount*self.values[s[0]])
     
