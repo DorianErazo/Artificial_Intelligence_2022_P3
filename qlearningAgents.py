@@ -15,6 +15,7 @@
 from game import *
 from learningAgents import ReinforcementAgent
 from featureExtractors import *
+import random,util,math
 
 import random,util,math
 
@@ -130,26 +131,26 @@ class QLearningAgent(ReinforcementAgent):
     return action
 
   def update(self, state, action, nextState, reward):
-      """
-        The parent class calls this to observe a
-        state = action => nextState and reward transition.
-        You should do your Q-Value update here
+    """
+      The parent class calls this to observe a
+      state = action => nextState and reward transition.
+      You should do your Q-Value update here
 
-        NOTE: You should never call this function,
-        it will be called on your behalf
-      """
-      "*** YOUR CODE HERE ***"
-      originalValue = self.getQValue(state, action)
-      nextStateValue = self.computeValueFromQValues(nextState)
-      #aplicamos la formula
-      newValue = (1 - self.alpha) * originalValue + self.alpha * (reward + self.discount * nextStateValue)
-      self.QValues[(state, action)] = newValue
+      NOTE: You should never call this function,
+      it will be called on your behalf
+    """
+    "*** YOUR CODE HERE ***"
+    originalValue = self.getQValue(state, action)
+    nextStateValue = self.computeValueFromQValues(nextState)
+    #aplicamos la formula
+    newValue = (1 - self.alpha) * originalValue + self.alpha * (reward + self.discount * nextStateValue)
+    self.QValues[(state, action)] = newValue
 
   def getPolicy(self, state):
-      return self.computeActionFromQValues(state)
+    return self.computeActionFromQValues(state)
 
   def getValue(self, state):
-      return self.computeValueFromQValues(state)
+    return self.computeValueFromQValues(state)
 
 
 class PacmanQAgent(QLearningAgent):
@@ -185,43 +186,90 @@ class PacmanQAgent(QLearningAgent):
 
 
 class ApproximateQAgent(PacmanQAgent):
+  """
+      ApproximateQLearningAgent
+
+      You should only have to overwrite getQValue
+      and update.  All other QLearningAgent functions
+      should work as is.
+  """
+  def __init__(self, extractor='IdentityExtractor', **args):
+    self.featExtractor = util.lookup(extractor, globals())()
+    PacmanQAgent.__init__(self, **args)
+    self.weights = util.Counter()
+
     """
-       ApproximateQLearningAgent
-
-       You should only have to overwrite getQValue
-       and update.  All other QLearningAgent functions
-       should work as is.
+    ************************************************************************
+    ************************************************************************
+    Aplicaremos epsilon-greedy al proyecto. El Algoritmo se basa en la exploracion 
+    y "explotacion"
+    Sea Q(S,A) nuestra tabla, Q es el es par de estado(S) accion(A),
+    La tabla contiene N estados y M acciones
+    (sea e Epsilon)
+    En la selección de acción e-greedy, nuestro agente utiliza tanto la explotación (1-e) para aprovechar e
+    l conocimiento previo como la exploración (e) para buscar nuevas opciones
+    Con una pequeña probabilidad de e, elegimos explorar, es decir,  no explotar lo que 
+    hemos aprendido hasta ahora. En este caso, la acción se selecciona aleatoriamente, independientemente de 
+    las estimaciones del valor de la acción.
+    
+    def select-action (Q,s_current_state,e)
+      n = rand(1 y 0)
+      if n < e then
+        A --> Random action from the action space
+      else
+        A --> MaxQ(S,A)
+      end
+      return A.
+    ************************************************************************
+    ************************************************************************
     """
-    def __init__(self, extractor='IdentityExtractor', **args):
-        self.featExtractor = util.lookup(extractor, globals())()
-        PacmanQAgent.__init__(self, **args)
-        self.weights = util.Counter()
 
-    def getWeights(self):
-        return self.weights
+  def getWeights(self):
+    return self.weights
 
-    def getQValue(self, state, action):
-        """
-          Should return Q(state,action) = w * featureVector
-          where * is the dotProduct operator
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+  def getQValue(self, state, action):
+    """
+      Should return Q(state,action) = w * featureVector
+      where * is the dotProduct operator
+    """
+    "*** YOUR CODE HERE ***"
+    weights = self.getWeights()
+    features = self.featExtractor.getFeatures(state, action)
+    q = weights * features
+    return q
+    util.raiseNotDefined()
 
-    def update(self, state, action, nextState, reward):
-        """
-           Should update your weights based on transition
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+  def update(self, state, action, nextState, reward):
+    """
+        Should update your weights based on transition
+    """
+    "*** YOUR CODE HERE ***"
+    #cogemos los atributos necesarios 
+    weights = self.getWeights()
+    features = self.featExtractor.getFeatures(state, action)
+    actions = self.getLegalActions(nextState)
+    maxQ = float("-inf")
 
-    def final(self, state):
-      "Called at the end of each game."
-      # call the super-class final method
-      PacmanQAgent.final(self, state)
+    #maxQ de cada action
+    for action2 in actions:
+      q = self.getQValue(nextState, action2)
+      maxQ = max(maxQ, q)
+    
+    if maxQ == float("-inf"):
+      maxQ = 0
 
-      # did we finish training?
-      if self.episodesSoFar == self.numTraining:
-          # you might want to print your weights here for debugging
-          "*** YOUR CODE HERE ***"
-          pass
+    for feature in features:
+      #Rt+1 + gammaMaxQ(St+1, a) - Q(St,At)
+      difference = (reward + self.discount*maxQ) - self.getQValue(state, action)
+      weights[feature] = weights[feature] + self.alpha * difference 
+
+  def final(self, state):
+    "Called at the end of each game."
+    # call the super-class final method
+    PacmanQAgent.final(self, state)
+
+    # did we finish training?
+    if self.episodesSoFar == self.numTraining:
+      # you might want to print your weights here for debugging
+      "*** YOUR CODE HERE ***"
+      return true
