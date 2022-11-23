@@ -83,16 +83,22 @@ class QLearningAgent(ReinforcementAgent):
     """
     "*** YOUR CODE HERE ***"
     value = float("-inf")
+    #tiene que ser una accion valida si no peta el test
     actions = self.getLegalActions(state)
     maxAction = None
 
+    #si no hay nada no devuelvo nada
     if not actions:
       return None
 
+    #repasamos todas las acciones
     for action in actions:
+      #comprobamos el valor hasta que encuentre el ideoneo 
       if value < self.getQValue(state, action):
         value = self.getQValue(state, action)
         maxAction = action
+
+    #devuelvo la mejor accion
     return maxAction
 
   def getAction(self, state):
@@ -110,9 +116,12 @@ class QLearningAgent(ReinforcementAgent):
     legalActions = self.getLegalActions(state)
     action = None
     "*** YOUR CODE HERE ***"
+    #accion random pero legal
     randomAction = random.choice(legalActions)
+    #cogemos la mejor accion calculada anteriormente
     bestAction = self.computeActionFromQValues(state)
 
+    #usamos el hint para poder coger la accion
     if util.flipCoin(self.epsilon):
       action = randomAction
     else:
@@ -132,6 +141,7 @@ class QLearningAgent(ReinforcementAgent):
       "*** YOUR CODE HERE ***"
       originalValue = self.getQValue(state, action)
       nextStateValue = self.computeValueFromQValues(nextState)
+      #aplicamos la formula
       newValue = (1 - self.alpha) * originalValue + self.alpha * (reward + self.discount * nextStateValue)
       self.QValues[(state, action)] = newValue
 
